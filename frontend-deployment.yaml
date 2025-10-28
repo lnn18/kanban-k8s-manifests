@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanban-ui-deployment
+  labels:
+    app: kanban-ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kanban-ui
+  template:
+    metadata:
+      labels:
+        app: kanban-ui
+    spec:
+      containers:
+        - name: kanban-ui
+          image: kanban-ui:latest
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 80  # Puerto estándar para aplicaciones web
+          env:
+          - name: API_URL
+            value: "http://kanban-app:8080"  # URL del backend
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanban-ui
+spec:
+  type: ClusterIP
+  selector:
+    app: kanban-ui
+  ports:
+  - port: 80
+    targetPort: 80

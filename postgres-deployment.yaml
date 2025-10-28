@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanban-postgres-deployment
+  labels:
+    app: kanban-postgres
+spec:
+  replicas: 1  # Solo 1 réplica para la base de datos
+  selector:
+    matchLabels:
+      app: kanban-postgres
+  template:
+    metadata:
+      labels:
+        app: kanban-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:9.6-alpine  # Imagen oficial de PostgreSQL
+        ports:
+        - containerPort: 5432  # Puerto estándar de PostgreSQL
+        env:
+        - name: POSTGRES_DB
+          value: "kanban"  # Nombre de la base de datos
+        - name: POSTGRES_USER
+          value: "kanban"  # Usuario administrador
+        - name: POSTGRES_PASSWORD
+          value: "kanban"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanban-postgres  # Nombre que usarán otros componentes para conectarse
+spec:
+  type: ClusterIP  # Solo accesible dentro del cluster
+  selector:
+    app: kanban-postgres  # Conecta con los pods que tienen esta etiqueta
+  ports:
+    - port: 5432  # Puerto del Service
+      targetPort: 5432  # Puerto del contenedor
